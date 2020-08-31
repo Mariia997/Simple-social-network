@@ -1,5 +1,8 @@
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.contrib.auth.models import User
+
+from likes.models import Like
 
 
 class userProfile(models.Model):
@@ -15,11 +18,14 @@ class userProfile(models.Model):
 class UserPost(models.Model):
     title = models.CharField(max_length=120)
     body = models.TextField()
-    date_post = models.DateTimeField()
-    user = models.ForeignKey(userProfile, related_name='posts', on_delete=models
+    date_post = models.DateTimeField(null=True)
+    user = models.ForeignKey(User, related_name='posts', on_delete=models
                              .CASCADE)
-    post_like = models.IntegerField(null=True)
-    post_unlike = models.IntegerField(null=True)
+    likes = GenericRelation(Like)
 
     def __str__(self):
         return self.title
+
+    @property
+    def total_likes(self):
+        return self.likes.count()
